@@ -93,4 +93,42 @@ describe('ENSO Monitor dashboard', () => {
       expect(historicalChart).toHaveTextContent('DJF 2020')
     })
   })
+
+  it('met à jour le tableau accessible lorsque le filtre de période change', async () => {
+    render(<App />)
+
+    await waitFor(() => {
+      expect(screen.getByText('3')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByText('Consulter les observations de la période'))
+
+    const table = screen.getByRole('table', {
+      name: 'Observations ONI de 1990 à 2026',
+    })
+
+    expect(table).toHaveTextContent('1990')
+    expect(table).toHaveTextContent('DJF')
+    expect(table).toHaveTextContent('+0,3')
+    expect(table).toHaveTextContent('2000')
+    expect(table).toHaveTextContent('+1,2')
+    expect(table).toHaveTextContent('2020')
+    expect(table).toHaveTextContent('-0,8')
+
+    fireEvent.change(screen.getByLabelText('Début'), {
+      target: { value: '2010' },
+    })
+
+    await waitFor(() => {
+      const filteredTable = screen.getByRole('table', {
+        name: 'Observations ONI de 2010 à 2026',
+      })
+      expect(filteredTable).toHaveTextContent('2020')
+      expect(filteredTable).toHaveTextContent('-0,8')
+      expect(filteredTable).not.toHaveTextContent('1990')
+      expect(filteredTable).not.toHaveTextContent('+0,3')
+      expect(filteredTable).not.toHaveTextContent('2000')
+      expect(filteredTable).not.toHaveTextContent('+1,2')
+    })
+  })
 })

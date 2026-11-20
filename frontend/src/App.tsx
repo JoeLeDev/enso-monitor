@@ -23,6 +23,17 @@ function formatPeriod(observation: Observation) {
   return `${observation.season} ${observation.year}`
 }
 
+function formatOniValue(value: number) {
+  const absolute = Math.abs(value).toLocaleString('fr-FR', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  })
+
+  if (value > 0) return `+${absolute}`
+  if (value < 0) return `-${absolute}`
+  return absolute
+}
+
 function App() {
   const [observations, setObservations] = useState<Observation[]>([])
   const [comparison, setComparison] = useState<ComparisonResponse | null>(null)
@@ -251,6 +262,39 @@ function App() {
               Les seuils ±0,5 °C servent de repères ; une saison isolée ne
               suffit pas à confirmer un épisode ENSO.
             </p>
+
+            <details className="observations-table-panel">
+              <summary>Consulter les observations de la période</summary>
+              {filteredObservations.length === 0 ? (
+                <p className="observations-table-empty">
+                  Aucune observation pour cette période
+                </p>
+              ) : (
+                <div className="observations-table-scroll">
+                  <table className="observations-table">
+                    <caption>
+                      Observations ONI de {startYear} à {endYear}
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Année</th>
+                        <th scope="col">Saison</th>
+                        <th scope="col">ONI (°C)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredObservations.map((item) => (
+                        <tr key={`${item.year}-${item.season}-${item.season_order}`}>
+                          <td>{item.year}</td>
+                          <td>{item.season}</td>
+                          <td>{formatOniValue(item.value)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </details>
           </section>
 
           <section className="chart-card">
