@@ -134,13 +134,14 @@ h2 {
   border: 1px solid #dbe5e7;
   border-radius: 12px;
   background: #f8fafc;
-  padding: 4px 12px 12px;
+  padding: 4px 14px 12px 18px;
 }
 
 .observations-table-panel > summary {
   cursor: pointer;
   list-style-position: outside;
-  padding: 12px 4px;
+  padding: 12px 4px 12px 6px;
+  margin-left: 4px;
   font-size: 14px;
   font-weight: 600;
   color: #0f766e;
@@ -200,6 +201,47 @@ h2 {
 
 .observations-table tbody tr:last-child td {
   border-bottom: none;
+}
+
+.observations-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 4px;
+}
+
+.observations-pagination-button {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.observations-pagination-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.observations-pagination-button:focus {
+  outline: none;
+}
+
+.observations-pagination-button:focus-visible {
+  outline: 2px solid #0f766e;
+  outline-offset: 2px;
+}
+
+.observations-pagination-status {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+  text-align: center;
 }
 
 .error {
@@ -267,12 +309,13 @@ h2 {
   }
 
   .observations-table-panel {
-    padding: 2px 8px 10px;
+    padding: 2px 10px 10px 14px;
   }
 
   .observations-table-panel > summary {
     font-size: 13px;
-    padding: 10px 2px;
+    padding: 10px 2px 10px 4px;
+    margin-left: 2px;
   }
 
   .observations-table {
@@ -282,6 +325,17 @@ h2 {
   .observations-table th,
   .observations-table td {
     padding: 8px 6px;
+  }
+
+  .observations-pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .observations-pagination-status {
+    order: -1;
+    width: 100%;
   }
 }
 

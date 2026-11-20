@@ -104,7 +104,7 @@ describe('ENSO Monitor dashboard', () => {
     fireEvent.click(screen.getByText('Consulter les observations de la période'))
 
     const table = screen.getByRole('table', {
-      name: 'Observations ONI de 1990 à 2026',
+      name: /Observations ONI de 1990 à 2026/,
     })
 
     expect(table).toHaveTextContent('1990')
@@ -121,7 +121,7 @@ describe('ENSO Monitor dashboard', () => {
 
     await waitFor(() => {
       const filteredTable = screen.getByRole('table', {
-        name: 'Observations ONI de 2010 à 2026',
+        name: /Observations ONI de 2010 à 2026/,
       })
       expect(filteredTable).toHaveTextContent('2020')
       expect(filteredTable).toHaveTextContent('-0,8')
@@ -130,5 +130,45 @@ describe('ENSO Monitor dashboard', () => {
       expect(filteredTable).not.toHaveTextContent('2000')
       expect(filteredTable).not.toHaveTextContent('+1,2')
     })
+  })
+
+  it('pagine le tableau accessible au-delà de douze observations', async () => {
+    const seasons = [
+      'DJF', 'JFM', 'FMA', 'MAM', 'AMJ', 'MJJ',
+      'JJA', 'JAS', 'ASO', 'SON', 'OND', 'NDJ',
+    ]
+
+    mockGetObservations.mockResolvedValue({
+      total: 14,
+      observations: Array.from({ length: 14 }, (_, index) => ({
+        year: 1990 + Math.floor(index / 12),
+        season: seasons[index % 12],
+        season_order: (index % 12) + 1,
+        value: index === 0 ? 0.3 : index === 12 ? 1.1 : index === 13 ? -0.4 : 0.1,
+      })),
+    })
+
+    render(<App />)
+
+    await waitFor(() => {
+      expect(screen.getByText('14')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByText('Consulter les observations de la période'))
+
+    expect(screen.getByText('Page 1 sur 2')).toBeInTheDocument()
+    expect(screen.getByRole('table')).toHaveTextContent('DJF')
+    expect(screen.getByRole('table')).toHaveTextContent('+0,3')
+    expect(screen.getByRole('table')).not.toHaveTextContent('+1,1')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Suivant' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Page 2 sur 2')).toBeInTheDocument()
+    })
+
+    expect(screen.getByRole('table')).toHaveTextContent('+1,1')
+    expect(screen.getByRole('table')).toHaveTextContent('-0,4')
+    expect(screen.getByRole('table')).not.toHaveTextContent('+0,3')
   })
 })

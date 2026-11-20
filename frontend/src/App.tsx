@@ -34,12 +34,14 @@ function formatOniValue(value: number) {
   return absolute
 }
 
+const OBSERVATIONS_PAGE_SIZE = 12
+
 function App() {
   const [observations, setObservations] = useState<Observation[]>([])
   const [comparison, setComparison] = useState<ComparisonResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
+  const [tablePage, setTablePage] = useState(1)
 
   const isMobile = useIsMobile()
 
@@ -88,6 +90,20 @@ function App() {
     ),
     [observations, startYear, endYear],
   )
+
+  const tablePageCount = Math.max(
+    1,
+    Math.ceil(filteredObservations.length / OBSERVATIONS_PAGE_SIZE),
+  )
+  const safeTablePage = Math.min(tablePage, tablePageCount)
+
+  const pagedObservations = useMemo(() => {
+    const startIndex = (safeTablePage - 1) * OBSERVATIONS_PAGE_SIZE
+    return filteredObservations.slice(
+      startIndex,
+      startIndex + OBSERVATIONS_PAGE_SIZE,
+    )
+  }, [filteredObservations, safeTablePage])
 
   const chartData = useMemo(
     () => filteredObservations.map((item) => ({
@@ -211,7 +227,10 @@ function App() {
                     min={1950}
                     max={endYear}
                     value={startYear}
-                    onChange={(e) => setStartYear(Number(e.target.value))}
+                    onChange={(e) => {
+                      setStartYear(Number(e.target.value))
+                      setTablePage(1)
+                    }}
                   />
                 </label>
                 <label>
@@ -221,7 +240,10 @@ function App() {
                     min={startYear}
                     max={2100}
                     value={endYear}
-                    onChange={(e) => setEndYear(Number(e.target.value))}
+                    onChange={(e) => {
+                      setEndYear(Number(e.target.value))
+                      setTablePage(1)
+                    }}
                   />
                 </label>
               </div>
@@ -270,29 +292,59 @@ function App() {
                   Aucune observation pour cette période
                 </p>
               ) : (
-                <div className="observations-table-scroll">
-                  <table className="observations-table">
-                    <caption>
-                      Observations ONI de {startYear} à {endYear}
-                    </caption>
-                    <thead>
-                      <tr>
-                        <th scope="col">Année</th>
-                        <th scope="col">Saison</th>
-                        <th scope="col">ONI (°C)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredObservations.map((item) => (
-                        <tr key={`${item.year}-${item.season}-${item.season_order}`}>
-                          <td>{item.year}</td>
-                          <td>{item.season}</td>
-                          <td>{formatOniValue(item.value)}</td>
+                <>
+                  <div className="observations-table-scroll">
+                    <table className="observations-table">
+                      <caption>
+                        Observations ONI de {startYear} à {endYear}
+                        {' · '}
+                        {filteredObservations.length} valeur
+                        {filteredObservations.length > 1 ? 's' : ''}
+                      </caption>
+                      <thead>
+                        <tr>
+                          <th scope="col">Année</th>
+                          <th scope="col">Saison</th>
+                          <th scope="col">ONI (°C)</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {pagedObservations.map((item) => (
+                          <tr key={`${item.year}-${item.season}-${item.season_order}`}>
+                            <td>{item.year}</td>
+                            <td>{item.season}</td>
+                            <td>{formatOniValue(item.value)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <nav
+                    className="observations-pagination"
+                    aria-label="Pagination des observations"
+                  >
+                    <button
+                      type="button"
+                      className="observations-pagination-button"
+                      onClick={() => setTablePage((page) => Math.max(1, page - 1))}
+                      disabled={safeTablePage <= 1}
+                    >
+                      Précédent
+                    </button>
+                    <p className="observations-pagination-status" aria-live="polite">
+                      Page {safeTablePage} sur {tablePageCount}
+                    </p>
+                    <button
+                      type="button"
+                      className="observations-pagination-button"
+                      onClick={() => setTablePage((page) => Math.min(tablePageCount, page + 1))}
+                      disabled={safeTablePage >= tablePageCount}
+                    >
+                      Suivant
+                    </button>
+                  </nav>
+                </>
               )}
             </details>
           </section>
