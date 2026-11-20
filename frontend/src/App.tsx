@@ -32,12 +32,11 @@ function App() {
 
   const isMobile = useIsMobile()
 
-  const [startYear, setStartYear] = useState(() => (isMobile ? 2016 : 1990))
+  const [startYear, setStartYear] = useState(
+    () => window.matchMedia('(max-width: 600px)').matches ? 2016 : 1990,
+  )
   const [endYear, setEndYear] = useState(2026)
 
-  useEffect(() => {
-    setStartYear(isMobile ? 2016 : 1990)
-  }, [isMobile])
 
   useEffect(() => {
     let cancelled = false
