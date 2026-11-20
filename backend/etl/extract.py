@@ -70,7 +70,6 @@ def parse_oni_table(content: bytes) -> pd.DataFrame:
 
     raise ValueError("Tableau ONI introuvable sur la page NOAA")
 
-    
 def extract_oni_with_metadata() -> ExtractionResult:
     """Télécharge NOAA et retourne les données avec leur provenance."""
     response = requests.get(NOAA_ONI_URL, timeout=20)
