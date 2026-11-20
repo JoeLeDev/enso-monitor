@@ -193,3 +193,40 @@ h2 {
     font-size: 10px;
   }
 }
+
+.scientific-analysis {
+  margin-top: 24px;
+  padding: 20px 24px;
+  border: 1px solid #dbe5e7;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.scientific-analysis h3 {
+  margin: 0 0 12px;
+  color: #0f766e;
+  font-size: 1.05rem;
+}
+
+.scientific-analysis p {
+  margin: 0 0 12px;
+  line-height: 1.7;
+  color: #334155;
+}
+
+.scientific-analysis p:last-child {
+  margin-bottom: 0;
+}
+
+.scientific-analysis .analysis-disclaimer {
+  padding-top: 12px;
+  border-top: 1px solid #dbe5e7;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+  .scientific-analysis {
+    padding: 16px;
+  }
+}
