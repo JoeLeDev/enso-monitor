@@ -107,6 +107,39 @@ function App() {
     }))
   }, [comparison])
 
+  const comparisonSummary = useMemo(() => {
+    if (!comparison) return null
+
+    const first = comparison.period_1.observations
+    const second = comparison.period_2.observations
+
+    if (!first.length || !second.length) return null
+
+    const peak1997 = Math.max(...first.map((item) => item.value))
+    const peak2015 = Math.max(...second.map((item) => item.value))
+
+    const difference = Math.abs(peak1997 - peak2015)
+
+    let interpretation: string
+
+    if (difference < 0.1) {
+      interpretation =
+        'Les deux épisodes présentent des maxima ONI très proches.'
+    } else if (peak1997 > peak2015) {
+      interpretation =
+        "L'épisode 1997–1998 présente un maximum ONI supérieur à celui de 2015–2016."
+    } else {
+      interpretation =
+        "L'épisode 2015–2016 présente un maximum ONI supérieur à celui de 1997–1998."
+    }
+
+    return {
+      peak1997,
+      peak2015,
+      interpretation,
+    }
+  }, [comparison])
+
   return (
     <main className="dashboard">
       <header className="dashboard-header">
@@ -266,6 +299,42 @@ function App() {
               Les courbes sont alignées par position dans chaque période,
               pour comparer leur évolution respective.
             </p>
+
+            {comparisonSummary && (
+              <div className="scientific-analysis">
+                <h3>Interprétation des épisodes El Niño</h3>
+
+                <p>
+                  Les épisodes de 1997–1998 et 2015–2016 présentent
+                  des anomalies positives importantes de température
+                  de surface de la mer dans la région Niño 3.4.
+                </p>
+
+                <p>
+                  Le maximum ONI observé sur la période 1997–1998 est de{' '}
+                  <strong>{comparisonSummary.peak1997.toFixed(1)} °C</strong>,
+                  contre{' '}
+                  <strong>{comparisonSummary.peak2015.toFixed(1)} °C</strong>{' '}
+                  pour 2015–2016.
+                  {' '}{comparisonSummary.interpretation}
+                </p>
+
+                <p>
+                  Cette comparaison permet d'observer les différences
+                  d'intensité et d'évolution saisonnière entre les deux
+                  périodes. Cependant, l'ONI repose sur des moyennes
+                  glissantes de trois mois : les observations successives
+                  ne sont donc pas indépendantes.
+                </p>
+
+                <p className="analysis-disclaimer">
+                  Cette analyse est descriptive et limitée aux périodes
+                  sélectionnées. Elle ne permet pas, à elle seule,
+                  de prévoir les futurs épisodes ENSO ni d'en déduire
+                  directement leurs impacts climatiques régionaux.
+                </p>
+              </div>
+            )}
           </section>
 
           <footer className="footer">
